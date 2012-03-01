@@ -7,9 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.Window;
+import android.view.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -27,19 +25,22 @@ public class GameActivity extends Activity {
         setContentView(new Panel(this));
     }
 
-    private class Panel extends SurfaceView implements SurfaceHolder.Callback{
+    private class Panel extends SurfaceView implements SurfaceHolder.Callback {
 
         public Panel(Context context) {
             super(context);
             getHolder().addCallback(this);
             thread = new GameThread(getHolder(), this);
+            wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            display = wm.getDefaultDisplay();
         }
 
         @Override
-        public void onDraw(Canvas canvas){
+        public void onDraw(Canvas canvas) {
             Bitmap scratch = BitmapFactory.decodeResource(getResources(), R.drawable.tablut_board);
             canvas.drawColor(Color.BLACK);
-            canvas.drawBitmap(scratch, 10, 10, null);
+            Bitmap scaledImage = Bitmap.createScaledBitmap(scratch, display.getWidth() - 20, display.getWidth() - 20, true);
+            canvas.drawBitmap(scaledImage, 10, 10, null);
         }
 
         @Override
@@ -57,42 +58,44 @@ public class GameActivity extends Activity {
         public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
             boolean retry = true;
             thread.setRunning(false);
-            while (retry){
-                try{
+            while (retry) {
+                try {
                     thread.join();
                     retry = false;
-                } catch (InterruptedException ex){
+                } catch (InterruptedException ex) {
 
                 }
             }
         }
 
+        private Display display;
+        private WindowManager wm;
         private GameThread thread;
     }
 
-    private class GameThread extends Thread{
+    private class GameThread extends Thread {
 
-        public GameThread(SurfaceHolder surfaceHolder, Panel panel){
+        public GameThread(SurfaceHolder surfaceHolder, Panel panel) {
             this.surfaceHolder = surfaceHolder;
             this.panel = panel;
         }
 
-        public void setRunning(boolean run){
+        public void setRunning(boolean run) {
             this.run = run;
         }
 
         @Override
-        public void run(){
+        public void run() {
             Canvas canvas;
-            while (run){
+            while (run) {
                 canvas = null;
-                try{
+                try {
                     canvas = surfaceHolder.lockCanvas(null);
-                    synchronized (surfaceHolder){
+                    synchronized (surfaceHolder) {
                         panel.onDraw(canvas);
                     }
                 } finally {
-                    if (canvas != null){
+                    if (canvas != null) {
                         surfaceHolder.unlockCanvasAndPost(canvas);
                     }
                 }
