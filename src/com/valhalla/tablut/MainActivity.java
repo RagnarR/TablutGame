@@ -2,6 +2,9 @@ package com.valhalla.tablut;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
@@ -9,13 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by IntelliJ IDEA.
- * User: aaniskou
- * Date: 29.02.12
- * Time: 5:43
- * To change this template use File | Settings | File Templates.
- */
 public class MainActivity extends Activity {
 
     public void onCreate(Bundle savedInstanceState) {
@@ -39,6 +35,30 @@ public class MainActivity extends Activity {
 
         listView = (ListView) findViewById(R.id.list);
         listView.setAdapter(simpleAdapter);
+        Log.d("MenuActivity", "=======================");
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                Log.d("MenuActivity", "We are in OnItemClick method!");
+                Log.d("MenuActivity", "Click on ITEM_ID: " + position);
+
+                switch (position) {
+                    case 0:
+                        Log.d("MenuActivity", "Click on New Game");
+                        break;
+                    case 1:
+                        Log.d("MenuActivity", "Click on Settings");
+                        break;
+                    case 2:
+                        Log.d("MenuActivity", "Click on Rules");
+                        break;
+                    case 3:
+                        Log.d("MenuActivity", "Click on About");
+                        break;
+                }
+            }
+        });
     }
 
     final String ATTRIBUTE_NAME_TEXT = "text";
